@@ -1,2 +1,2 @@
 # growup-sql
-Code generated in a training I'm attending
+Scripts generated in a training I'm attending
