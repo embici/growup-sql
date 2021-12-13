@@ -32,7 +32,7 @@ WHERE ContinentName = 'North America'
 
 
 -- SOLUCION TAREA
-SELECT producto_sc.ProductSubcategoryName, geo.StateProvinceName, calendario.Mes, tiendas.StoreType, ventas.SalesAmount
+SELECT producto_sc.ProductSubcategoryName, geo.StateProvinceName, calendario.Mes, tiendas.StoreType, sum(ventas.SalesAmount) as Ventas_Totales
 FROM Product_SubCategory as producto_sc 
 INNER JOIN Product as producto
 ON producto_sc.ProductCategoryKey = producto.Product_Key
@@ -42,6 +42,7 @@ INNER JOIN Stores as tiendas
 ON ventas.StoreKey = tiendas.Store_Key
 INNER JOIN [Geography] as geo
 ON tiendas.Geography_Key = geo.GeographyKey
-INNER JOIN [Date] as calendario
+INNER JOIN Date as calendario
 ON ventas.DateKey = calendario.Fecha
 WHERE geo.ContinentName = 'North America' AND DATEPART(yy, ventas.DateKey) = 2018 AND tiendas.Status = 'On' AND (tiendas.StoreType = 'Online' OR tiendas.StoreType = 'Store')
+GROUP BY producto_sc.ProductSubcategoryName, geo.StateProvinceName, calendario.Mes, tiendas.StoreType
