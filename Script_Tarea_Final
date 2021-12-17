@@ -1,0 +1,137 @@
+-- QUERIES
+-- Ventas Totales
+SELECT SUM(facturaLn.UnitPrice) as VentasTotales
+FROM InvoiceLine as facturaLn
+
+-- Ventas Totales Rock
+SELECT SUM(facturaLn.UnitPrice) as VentasTotales
+FROM InvoiceLine as facturaLn
+INNER JOIN Track as cancion
+ON cancion.TrackId = facturaLn.TrackId
+INNER JOIN Genre as genero
+ON cancion.GenreId = genero.GenreId
+WHERE genero.Name = 'Rock'
+
+-- Ventas Totales Pop
+SELECT SUM(facturaLn.UnitPrice) as VentasTotales
+FROM InvoiceLine as facturaLn
+INNER JOIN Track as cancion
+ON cancion.TrackId = facturaLn.TrackId
+INNER JOIN Genre as genero
+ON cancion.GenreId = genero.GenreId
+WHERE genero.Name = 'Pop'
+
+-- TOP 10 Canciones mas vendidas
+SELECT TOP 10 cancion.Name as Nombre, SUM(facturaLn.UnitPrice) as VentasTotales
+FROM InvoiceLine as facturaLn
+INNER JOIN Invoice as factura
+ON facturaLn.InvoiceId = factura.InvoiceId
+INNER JOIN Track as cancion
+ON cancion.TrackId = facturaLn.TrackId
+GROUP BY cancion.Name
+ORDER BY VentasTotales DESC
+
+-- TOP 10 Artistas mas vendidos
+SELECT TOP 10 artista.Name as Nombre, SUM(facturaLn.UnitPrice) as VentasTotales
+FROM InvoiceLine as facturaLn
+INNER JOIN Invoice as factura
+ON facturaLn.InvoiceId = factura.InvoiceId
+INNER JOIN Track as cancion
+ON cancion.TrackId = facturaLn.TrackId
+INNER JOIN Album as album
+ON cancion.AlbumId = album.AlbumId
+INNER JOIN Artist as artista
+ON artista.ArtistId = album.ArtistId
+GROUP BY artista.Name
+ORDER BY VentasTotales DESC
+
+-- TOP 10 Album mas vendidos
+SELECT TOP 10 album.Title as Album, SUM(facturaLn.UnitPrice) as VentasTotales
+FROM InvoiceLine as facturaLn
+INNER JOIN Invoice as factura
+ON facturaLn.InvoiceId = factura.InvoiceId
+INNER JOIN Track as cancion
+ON cancion.TrackId = facturaLn.TrackId
+INNER JOIN Album as album
+ON cancion.AlbumId = album.AlbumId
+GROUP BY album.Title
+ORDER BY VentasTotales DESC
+
+-- TOP 10 Genero mas vendidos
+SELECT TOP 10 genero.Name as Genero, SUM(facturaLn.UnitPrice) as VentasTotales
+FROM InvoiceLine as facturaLn
+INNER JOIN Invoice as factura
+ON facturaLn.InvoiceId = factura.InvoiceId
+INNER JOIN Track as cancion
+ON cancion.TrackId = facturaLn.TrackId
+INNER JOIN Genre as genero
+ON cancion.GenreId = genero.GenreId
+GROUP BY genero.Name
+ORDER BY VentasTotales DESC
+
+-- Ventas por Pais
+SELECT factura.BillingCountry as Pais, SUM(facturaLn.UnitPrice) as VentasTotales
+FROM InvoiceLine as facturaLn
+INNER JOIN Invoice as factura
+ON facturaLn.InvoiceId = factura.InvoiceId
+GROUP BY factura.BillingCountry
+ORDER BY VentasTotales DESC
+
+-- Historico de Ventas por dias
+SELECT factura.InvoiceDate as Fecha, factura.BillingCountry as Pais, SUM(facturaLn.UnitPrice) as VentasTotales
+FROM InvoiceLine as facturaLn
+INNER JOIN Invoice as factura
+ON facturaLn.InvoiceId = factura.InvoiceId
+GROUP BY factura.InvoiceDate, factura.BillingCountry
+ORDER BY factura.InvoiceDate ASC
+
+-- Ventas por Año
+SELECT Year(factura.InvoiceDate) as Year_Ventas, SUM(facturaLn.UnitPrice) as VentasTotales
+FROM InvoiceLine as facturaLn
+INNER JOIN Invoice as factura
+ON facturaLn.InvoiceId = factura.InvoiceId
+GROUP BY Year(factura.InvoiceDate)
+ORDER BY Year(factura.InvoiceDate) ASC
+
+-- Lista de Playlists
+SELECT *
+FROM Playlist
+
+-- Canciones incluidas en playlists
+SELECT cancion.Name as Nombre, playlist.Name, playlist.PlaylistId
+FROM InvoiceLine as facturaLn
+INNER JOIN Invoice as factura
+ON facturaLn.InvoiceId = factura.InvoiceId
+INNER JOIN Track as cancion
+ON cancion.TrackId = facturaLn.TrackId
+INNER JOIN PlaylistTrack as playlistTrack
+ON cancion.TrackId = playlistTrack.TrackId
+INNER JOIN Playlist as playlist
+ON playlistTrack.PlaylistId = playlist.PlaylistId
+GROUP BY cancion.Name, playlist.Name, playlist.PlaylistId
+ORDER BY playlist.Name ASC
+
+-- Playlists vacios
+SELECT playlist.Name
+FROM InvoiceLine as facturaLn
+INNER JOIN Invoice as factura
+ON facturaLn.InvoiceId = factura.InvoiceId
+INNER JOIN Track as cancion
+ON cancion.TrackId = facturaLn.TrackId
+INNER JOIN PlaylistTrack as playlistTrack
+ON cancion.TrackId = playlistTrack.TrackId
+FULL OUTER JOIN Playlist as playlist
+ON playlistTrack.PlaylistId = playlist.PlaylistId
+WHERE playlistTrack.PlaylistId IS NULL
+GROUP BY cancion.Name, playlist.Name
+ORDER BY playlist.Name ASC
+
+
+/*
+- Analizar los resultados obtenidos. Interpretación de las tres gráficas
+
+El pais con mayor ganancias es USA, por lo tanto es donde conviene mas invertir a futuro.
+Ademas el genero musical que mas vende es Rock y el grupo musical que mas vende es Iron Maiden.
+Si tuvieramos que invertir en publicidad se podria enfocar hacia un publico meta que consuma musica rock en USA.
+
+*/
